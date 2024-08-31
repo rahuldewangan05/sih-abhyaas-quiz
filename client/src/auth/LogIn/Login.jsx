@@ -2,23 +2,51 @@ import React from "react";
 import { ArrowRight } from "lucide-react";
 import Logo from "../../assets/logo.png";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../redux/authSlice";
 import { auth, provider, signInWithPopup } from "../firebase";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Dispatch login action with user information
-      dispatch(login({ uid: user.uid, displayName: user.displayName, email: user.email }));
+      dispatch(
+        login({
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+        })
+      );
 
-      // Redirect to home page after successful login
-      window.location.href = "/home";
+      navigate("/home");
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
+  };
+
+  // Handle login with email and password
+  const handleMongoLogin = async () => {
+    try {
+      const response = await axios.post("/api/auth/login", { email, password });
+
+      if (response.status === 200) {
+        const { token, user } = response.data;
+
+        // Store the token in local storage
+        localStorage.setItem("jwtToken", token);
+
+        // Dispatch login action
+        dispatch(
+          login({ uid: user.id, fullName: user.fullName, email: user.email })
+        );
+
+        navigate("/home");
+      }
     } catch (error) {
       console.error("Error during login:", error);
     }
@@ -28,16 +56,19 @@ const Login = () => {
     <section>
       <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
-          <div className="mb-2 flex justify-center">
+          <div className="flex justify-center mb-2">
             {/* Logo */}
             <img src={Logo} alt="Signin Logo" width="200px" />
           </div>
-          <h2 className="text-center text-2xl font-bold leading-tight text-bookmark-blue">
+          <h2 className="text-2xl font-bold leading-tight text-center text-bookmark-blue">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-bookmark-grey">
+          <p className="mt-2 text-sm text-center text-bookmark-grey">
             Don&apos;t have an account?{" "}
-            <Link to="/signup" className="font-semibold text-bookmark-blue transition-all duration-200 hover:underline">
+            <Link
+              to="/signup"
+              className="font-semibold transition-all duration-200 text-bookmark-blue hover:underline"
+            >
               Create a free account
             </Link>
           </p>
@@ -45,47 +76,49 @@ const Login = () => {
             <div className="space-y-5">
               <div>
                 <label
-                  htmlFor=""
+                  htmlFor="email"
                   className="text-base font-medium text-bookmark-blue"
                 >
                   Email address
                 </label>
                 <div className="mt-2">
                   <input
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-bookmark-blue focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex w-full h-10 px-3 py-2 text-sm bg-white border border-gray-300 rounded-md placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-bookmark-blue focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="email"
                     placeholder="Email"
+                    id="email"
                   />
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between">
                   <label
-                    htmlFor=""
+                    htmlFor="password"
                     className="text-base font-medium text-bookmark-blue"
                   >
                     Password
                   </label>
-                  <a
-                    href="#"
-                    title=""
+                  <Link
+                    to="/forgot-password" // Update with the route you want to navigate to
+                    title="Forgot password?"
                     className="text-sm font-semibold text-bookmark-blue hover:underline"
                   >
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <div className="mt-2">
                   <input
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-bookmark-blue focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex w-full h-10 px-3 py-2 text-sm bg-white border border-gray-300 rounded-md placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-bookmark-blue focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="password"
                     placeholder="Password"
+                    id="password"
                   />
                 </div>
               </div>
               <div>
                 <button
                   type="button"
-                  onClick={handleLogin}
+                  onClick={handleMongoLogin}
                   className="inline-flex w-full items-center justify-center rounded-md bg-bookmark-purple px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-bookmark-blue/90"
                 >
                   Get started <ArrowRight className="ml-2" size={16} />
@@ -96,12 +129,12 @@ const Login = () => {
           <div className="mt-3 space-y-3">
             <button
               type="button"
-              onClick={handleLogin}
+              onClick={handleGoogleLogin}
               className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
             >
-              <span className="mr-2 inline-block">
+              <span className="inline-block mr-2">
                 <svg
-                  className="h-6 w-6 text-rose-500"
+                  className="w-6 h-6 text-rose-500"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"

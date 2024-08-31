@@ -4,7 +4,6 @@ import Navbar from "../../components/Navbar/Navbar";
 import Hero from "../../components/Hero/Hero";
 import Features from "../../components/Features/Features";
 import Work from "../../components/Work/Work";
-import Footer from "../../Footer/Footer";
 
 function Home() {
   return (
@@ -13,7 +12,7 @@ function Home() {
       <Hero />
       <Features />
       <Work />
-      <Footer />
+
     </div>
   );
 }
