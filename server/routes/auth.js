@@ -85,7 +85,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/User'; // Adjust the path as needed
+import User from '../models/userModel'; // Adjust the path as needed
 
 const router = express.Router();
 

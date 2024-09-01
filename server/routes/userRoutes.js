@@ -1,10 +1,10 @@
+// /routes/userRoutes.js
 import express from 'express';
+import { registerUser, googleAuth } from '../controllers/userController.js';
 
 const router = express.Router();
 
-// Protected route example
-router.get('/protected-route', (req, res) => {
-  res.status(200).json({ message: 'This is a protected route' });
-});
+router.post('/register', registerUser);
+router.post('/google-auth', googleAuth);
 
 export default router;
